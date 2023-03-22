@@ -1,0 +1,75 @@
+---
+title: ECORAP analysis template 
+author: "ECO Rapper"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+format: 
+  html:
+    css: resources/AIMS-style.css
+    toc: true
+    toc-float: true
+    number-sections: true
+    number-depth: 3
+    embed-resources: true
+    code-fold: false
+    code-tools: true
+    code-summary: "Show the code"
+crossref:
+  fig-title: '**Figure**'
+  fig-labels: arabic
+  tbl-title: '**Table**'
+  tbl-labels: arabic
+engine: knitr
+bibliography: resources/references.bib
+output_dir: "docs"
+---
+
+```{r chunks, results='markdown', eval=TRUE, echo = FALSE}
+knitr::read_chunk('../R/functions.R')
+knitr::read_chunk('../R/analysis.R')
+```
+
+# Preparations
+
+- Load any helper functions
+
+```{r loadFunctions, results='markdown', eval=FALSE}
+```
+
+```{r setup, include=FALSE, warnings=FALSE, message=FALSE}
+```
+
+- Load required packages
+```{r loadPackages, results='markdown', eval = TRUE, warnings = FALSE, message = FALSE}
+```
+
+- Prepare paths
+```{r preparePaths, results='markdown', eval = TRUE}
+```
+
+# Coral Growth
+
+## Load Data
+
+1. Load the data
+```{r CoralGrowth readData, results='markdown', eval=TRUE}
+```
+2. Glimpse the data
+
+```{r CoralGrowth glimpse, results='markdown', eval=TRUE}
+```
+
+## Data processing
+
+1. Replace Acyt and Ahya with Atab in all Class* fields
+2. Exclude colonies that were dead or missing in 2022
+3. Only keep colonies that have good images in 2021 and 2022
+4. Drop the extraneous columns
+5. Add a colony ID
+6. Pivote longer
+7. ~~Express area in cm2~~
+8. Define unique hierarchical levels
+9. Define Site_code as each unique Reef/Site/Zone combination
+ 
+
+
+# Fish Abundance
