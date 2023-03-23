@@ -59,6 +59,10 @@ knitr::read_chunk('../R/analysis_fish_abundance.R')
 ```{r CoralGrowth glimpse, results='markdown', eval=TRUE}
 ```
 
+```{r CoralGrowth report table, results='markdown', eval=TRUE}
+```
+
+
 ## Data processing
 
 1. Replace `Acyt` and `Ahya` with `Atab` in all `Class*` fields
@@ -89,7 +93,7 @@ adjustments.
 
 ![](../output/figures/Hierarchy_CoralGrowth1.png)
 
-Focussing on just Class: _Atab_
+Focusing on just Class: _Atab_
 
 ![](../output/figures/Hierarchy_CoralGrowth3.png)
 

@@ -54,6 +54,7 @@ library(ggeffects)
 library(posterior)
 library(HDInterval)
 library(tidybayes)
+library(report)
 ## ----end
 
 ## ---- preparePaths

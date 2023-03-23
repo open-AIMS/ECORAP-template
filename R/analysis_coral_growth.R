@@ -14,6 +14,10 @@ data <- read_csv(paste0(DATA_PATH,
 data %>% glimpse() 
 ## ----end
 
+## ---- CoralGrowth report table
+data %>% report::report_table() 
+## ----end
+
 ## Process data =================================================================
 ## ---- CoralGrowth process
 data <- 
@@ -54,11 +58,11 @@ data <-
     mutate(Site_type = factor(str_sub(Site, 1, 2)))
 
 data %>% glimpse()
-saveRDS(data, file = paste0(DATA_PATH, "processed/data.RData"))
+saveRDS(data, file = paste0(DATA_PATH, "processed/data1.RData"))
 ## ----end
 
 ## ---- CoralGrowth process tests
-data <- readRDS(file = paste0(DATA_PATH, "processed/data.RData"))
+data <- readRDS(file = paste0(DATA_PATH, "processed/data1.RData"))
 ##1. There should be exactly two records per colony,
 ##   highlight those for which this is not the case
 data %>%
@@ -264,7 +268,7 @@ form <- bf(log(Area) ~ Site_Type*Zone +
 get_prior(form, data = data.sub1)
 ## ----end
 ## ---- CoralGrowth brms Model 3.1 fit
-priors <- set_prior("student_t(3, 2, 1)", class = "Intercept") +
+priors <- set_prior("student_t(3, -2, 1)", class = "Intercept") +
     set_prior("student_t(3, 0, 1)", class = "b") +
     set_prior("student_t(3, 0, 1)", class = "sd") +
     set_prior("student_t(3, 0, 1)", class = "sigma")
@@ -427,7 +431,7 @@ form <- bf(log(Area) ~ Treatment*Year +
 get_prior(form, data = data.sub)
 ## ----end
 ## ---- CoralGrowth brms Model 5.1 fit
-priors <- set_prior("student_t(3, 2, 1)", class = "Intercept") +
+priors <- set_prior("student_t(3, -2, 1)", class = "Intercept") +
     set_prior("student_t(3, 0, 1)", class = "b") +
     set_prior("student_t(3, 0, 1)", class = "sd") +
     set_prior("student_t(3, 0, 1)", class = "sigma")
