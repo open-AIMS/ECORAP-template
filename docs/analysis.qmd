@@ -181,6 +181,8 @@ Percentages              Beta                       logit: $log\left(\frac{\pi}{
 ![](../output/figures/Ppc4_mod1.1.png)
 
 #### DHARMa
+
+[https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html](https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html)
 ```{r CoralGrowth brms Model 1.1 DHARMa, results='markdown', eval=FALSE}
 ```
 ![](../output/figures/DHARMa1_mod1.1.png)
