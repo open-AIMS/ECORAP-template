@@ -25,7 +25,8 @@ output_dir: "docs"
 
 ```{r chunks, results='markdown', eval=TRUE, echo = FALSE}
 knitr::read_chunk('../R/functions.R')
-knitr::read_chunk('../R/analysis.R')
+knitr::read_chunk('../R/analysis_coral_growth.R')
+knitr::read_chunk('../R/analysis_fish_abundance.R')
 ```
 
 # Preparations
@@ -60,7 +61,7 @@ knitr::read_chunk('../R/analysis.R')
 
 ## Data processing
 
-1. Replace Acyt and Ahya with Atab in all Class* fields
+1. Replace `Acyt` and `Ahya` with `Atab` in all `Class*` fields
 2. Exclude colonies that were dead or missing in 2022
 3. Only keep colonies that have good images in 2021 and 2022
 4. Drop the extraneous columns
@@ -70,6 +71,591 @@ knitr::read_chunk('../R/analysis.R')
 8. Define unique hierarchical levels
 9. Define Site_code as each unique Reef/Site/Zone combination
  
+```{r CoralGrowth process, results='markdown', eval=TRUE}
+```
 
+Following on from a data processing stage, it is important to perform
+tests on the data to see if all expectations are met.
+
+For example, in this case there should be exactly two records per
+colony/Class (one for each year), so lets explore whether there are
+any that do not satisfy this expectation and make any necessary
+adjustments.
+
+```{r CoralGrowth process tests, results='markdown', eval=TRUE}
+```
+
+## Design
+
+![](../output/figures/Hierarchy_CoralGrowth1.png)
+
+Focussing on just Class: _Atab_
+
+![](../output/figures/Hierarchy_CoralGrowth3.png)
+
+
+## Exploratory Data Analysis
+
+```{r CoralGrowth EDA, results='markdown', eval=TRUE}
+```
+
+![](../output/figures/EDA1.png)
+
+- strong evidence of non-normality
+
+## Common Modelling families 
+
+::: {style="font-size: 90%;"}
+
+Response variable        Probability distribution   Link function                                                                                      Model name
+------------------       -------------------------  ------------------------                                                                           ------------- 
+Continuous measurements  Gaussian                   identity: $\mu$                                                                                    Linear regression
+                         Gamma                      inverse: $\frac{1}{\mu}$                                                                           Gamma regression
+													log: $log(\mu)$
+Counts                   Poisson                    log: $log(\mu)$                                                                                    Poisson regression
+                                                                                                                                                       log-linear model
+                         Negative binomial          log: $log(\mu)$                                                                                    Negative binomial regression
+                         Quasi-poisson              log: $log(\mu)$                                                                                    Poisson regression
+Binary, proportions      Binomial                   logit:  $log\left(\frac{\pi}{1-\pi}\right)$                                                        Logistic regression
+                                                    probit: $\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\alpha+\beta.X} exp\left(-\frac{1}{2}Z^2\right)dZ$   Probit regression
+                                                    Complimentary log-log: $log(-log(1-\pi))$                                                          Logistic regression
+Percentages              Beta                       logit: $log\left(\frac{\pi}{1-\pi}\right)$                                                         Beta regression
+                                                    
+
+* There are also zero-inflated and hurdle versions of some of the above
+:::
+
+## Exploratory Data Analysis
+
+```{r CoralGrowth EDA plots, results='markdown', eval=TRUE}
+```
+
+![](../output/figures/EDA3.png)
+
+- strong evidence of unbalance
+
+
+## Additional data processing
+
+```{r CoralGrowth processing further, results='markdown', eval=TRUE}
+```
+
+## Modelling (Gaussian, log-data) 
+
+::: {.panel-tabset}
+### RE only
+:::: {.panel-tabset}
+
+#### Priors 
+```{r CoralGrowth brms Model 1.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r CoralGrowth brms Model 1.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r CoralGrowth brms Model 1.1 posterior_prior, results='markdown', eval=FALSE}
+```
+![](../output/figures/Posterior_prior_mod1.1.png)
+
+
+#### MCMC Diagnostics
+```{r CoralGrowth brms Model 1.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod1.1.png)
+![](../output/figures/Ac_mod1.1.png)
+![](../output/figures/Rhat_mod1.1.png)
+
+#### PPC
+
+```{r CoralGrowth brms Model 1.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod1.1.png)
+![](../output/figures/Ppc3_mod1.1.png)
+![](../output/figures/Ppc4_mod1.1.png)
+
+#### DHARMa
+```{r CoralGrowth brms Model 1.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod1.1.png)
+
+::::
+
+:::
+
+## Modelling (Gaussian, log-data) 
+
+::: {.panel-tabset}
+### Site type & Zone 
+:::: {.panel-tabset}
+
+#### Priors 
+```{r CoralGrowth brms Model 3.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r CoralGrowth brms Model 3.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r CoralGrowth brms Model 3.1 posterior_prior, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Posterior_prior_mod3.1.png)
+
+#### MCMC Diagnostics
+```{r CoralGrowth brms Model 3.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod3.1.png)
+![](../output/figures/Ac_mod3.1.png)
+![](../output/figures/Rhat_mod3.1.png)
+
+
+#### PPC
+
+```{r CoralGrowth brms Model 3.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod3.1.png)
+![](../output/figures/Ppc2_mod3.1.png)
+![](../output/figures/Ppc3_mod3.1.png)
+![](../output/figures/Ppc4_mod3.1.png)
+
+#### DHARMa
+```{r CoralGrowth brms Model 3.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod3.1.png)
+![](../output/figures/DHARMa2_mod3.1.png)
+
+#### EM means
+
+```{r CoralGrowth brms Model 3.1 derived means, results='markdown', eval=FALSE}
+```
+```{r CoralGrowth brms Model 3.1 derived means figure, results='markdown', eval=FALSE}
+```
+![](../output/figures/Partial.type1_mod3.1.png)
+![](../output/figures/Partial.type_mod3.1.png)
+
+
+::::
+
+:::
+
+## Modelling (Gaussian, log-data) 
+
+::: {.panel-tabset}
+### Treatment & Year 
+:::: {.panel-tabset}
+
+#### Priors 
+```{r CoralGrowth brms Model 5.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r CoralGrowth brms Model 5.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r CoralGrowth brms Model 5.1 posterior_prior, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Posterior_prior_mod5.1.png)
+
+#### MCMC Diagnostics
+```{r CoralGrowth brms Model 5.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod5.1.png)
+![](../output/figures/Ac_mod5.1.png)
+![](../output/figures/Rhat_mod5.1.png)
+
+
+#### PPC
+
+```{r CoralGrowth brms Model 5.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod5.1.png)
+![](../output/figures/Ppc2_mod5.1.png)
+![](../output/figures/Ppc3_mod5.1.png)
+![](../output/figures/Ppc4_mod5.1.png)
+
+#### DHARMa
+```{r CoralGrowth brms Model 5.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod5.1.png)
+::::
+
+:::
+
+
+## Modelling (Gaussian, log-data) 
+
+::: {.panel-tabset}
+### Treatment & Year (no PAOR) 
+:::: {.panel-tabset}
+
+#### Priors 
+```{r CoralGrowth brms Model 6.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r CoralGrowth brms Model 6.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r CoralGrowth brms Model 6.1 posterior_prior, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Posterior_prior_mod6.1.png)
+
+#### MCMC Diagnostics
+```{r CoralGrowth brms Model 6.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod6.1.png)
+![](../output/figures/Ac_mod6.1.png)
+![](../output/figures/Rhat_mod6.1.png)
+
+
+#### PPC
+
+```{r CoralGrowth brms Model 6.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod6.1.png)
+![](../output/figures/Ppc2_mod6.1.png)
+![](../output/figures/Ppc3_mod6.1.png)
+![](../output/figures/Ppc4_mod6.1.png)
+
+#### DHARMa
+```{r CoralGrowth brms Model 6.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod6.1.png)
+
+
+#### EM means
+
+```{r CoralGrowth brms Model 6.1 Partial plots derived means, results='markdown', eval=FALSE}
+```
+```{r CoralGrowth brms Model 6.1 Partial plots derived means figure, results='markdown', eval=FALSE}
+```
+![](../output/figures/Partial.type1_mod6.1.png)
+![](../output/figures/Partial.type_mod6.1.png)
+
+#### Contrast means
+```{r CoralGrowth brms Model 6.1 Partial plots derived contrasts, results='markdown', eval=TRUE}
+```
+```{r CoralGrowth brms Model 6.1 Partial plots derived contrasts1, results='markdown', eval=FALSE}
+```
+```{r CoralGrowth brms Model 6.1 Partial plots derived contrasts1 figure, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Partial_contrast.Site_type1_mod6.1.png)
+
+#### Contrast effects
+```{r CoralGrowth brms Model 6.1 Partial plots derived contrasts effects, results='markdown', eval=TRUE}
+```
+```{r CoralGrowth brms Model 6.1 Partial plots derived contrasts effects1, results='markdown', eval=TRUE}
+```
+```{r CoralGrowth brms Model 6.1 Partial plots derived contrasts effects1 figure, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Partial_contrast.Site_type2_mod6.1.png)
+::::
+
+:::
 
 # Fish Abundance
+   
+## Load Data
+
+1. Load the data
+```{r FishAbundance readData, results='markdown', eval=TRUE, echo = TRUE}
+```
+2. Glimpse the data
+
+```{r FishAbundance glimpse, results='markdown', eval=TRUE, echo = TRUE}
+```
+
+## Data processing
+
+1. since abundance data typically only record presence, create a full
+   grid of all `plot_id` and `transect` combinations
+2. create a boolean flag for `Pomacentrus`
+3. sum abundance across species
+4. ensure 0 abundances are added
+5. extract Reef, Site and Zone info from the Site code
+6. remove unnecessary variables
+7. glimpse data
+8. save processed data
+
+```{r FishAbundance process, results='markdown', eval=TRUE, echo = TRUE}
+```
+ 
+## Design
+
+![](../output/figures/Hierarchy_FishAbundance1.png)
+
+
+## Exploratory Data Analysis
+
+```{r FishAbundance EDA, results='markdown', eval=TRUE}
+```
+
+![](../output/figures/EDA1_fish.png)
+![](../output/figures/EDA2_fish.png)
+
+
+## Common Modelling families 
+
+::: {style="font-size: 90%;"}
+
+Response variable        Probability distribution   Link function                                                                                      Model name
+------------------       -------------------------  ------------------------                                                                           ------------- 
+Continuous measurements  Gaussian                   identity: $\mu$                                                                                    Linear regression
+                         Gamma                      inverse: $\frac{1}{\mu}$                                                                           Gamma regression
+													log: $log(\mu)$
+Counts                   Poisson                    log: $log(\mu)$                                                                                    Poisson regression
+                                                                                                                                                       log-linear model
+                         Negative binomial          log: $log(\mu)$                                                                                    Negative binomial regression
+                         Quasi-poisson              log: $log(\mu)$                                                                                    Poisson regression
+Binary, proportions      Binomial                   logit:  $log\left(\frac{\pi}{1-\pi}\right)$                                                        Logistic regression
+                                                    probit: $\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\alpha+\beta.X} exp\left(-\frac{1}{2}Z^2\right)dZ$   Probit regression
+                                                    Complimentary log-log: $log(-log(1-\pi))$                                                          Logistic regression
+Percentages              Beta                       logit: $log\left(\frac{\pi}{1-\pi}\right)$                                                         Beta regression
+                                                    
+
+* There are also zero-inflated and hurdle versions of some of the above
+:::
+
+
+## Additional data processing
+
+```{r FishAbundance processing further, results='markdown', eval=TRUE, echo = TRUE}
+```
+
+
+## Modelling (Poisson) 
+
+::: {.panel-tabset}
+### RE only
+:::: {.panel-tabset}
+
+#### Priors 
+```{r FishAbundance brms Model 1.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r FishAbundance brms Model 1.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r FishAbundance brms Model 1.1 posterior_prior, results='markdown', eval=FALSE}
+```
+![](../output/figures/Posterior_prior_mod1.1_fish.png)
+
+
+#### MCMC Diagnostics
+```{r FishAbundance brms Model 1.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod1.1_fish.png)
+![](../output/figures/Ac_mod1.1_fish.png)
+![](../output/figures/Rhat_mod1.1_fish.png)
+
+#### PPC
+
+```{r FishAbundance brms Model 1.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod1.1_fish.png)
+![](../output/figures/Ppc3_mod1.1_fish.png)
+![](../output/figures/Ppc4_mod1.1_fish.png)
+
+#### DHARMa
+```{r FishAbundance brms Model 1.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod1.1_fish.png)
+
+::::
+
+:::
+
+
+## Modelling (Poisson) 
+
+::: {.panel-tabset}
+### Site type & Zone 
+:::: {.panel-tabset}
+
+#### Priors 
+```{r FishAbundance brms Model 2.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r FishAbundance brms Model 2.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r FishAbundance brms Model 2.1 posterior_prior, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Posterior_prior_mod2.1_fish.png)
+
+#### MCMC Diagnostics
+```{r FishAbundance brms Model 2.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod2.1_fish.png)
+![](../output/figures/Ac_mod2.1_fish.png)
+![](../output/figures/Rhat_mod2.1_fish.png)
+
+
+#### PPC
+
+```{r FishAbundance brms Model 2.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod2.1_fish.png)
+![](../output/figures/Ppc2_mod2.1_fish.png)
+![](../output/figures/Ppc3_mod2.1_fish.png)
+![](../output/figures/Ppc4_mod2.1_fish.png)
+
+#### DHARMa
+```{r FishAbundance brms Model 2.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod2.1_fish.png)
+
+#### EM means
+
+```{r FishAbundance brms Model 2.1 Partial plots derived means, results='markdown', eval=FALSE}
+```
+```{r FishAbundance brms Model 2.1 Partial plots derived means figure, results='markdown', eval=FALSE}
+```
+![](../output/figures/Partial.type1_mod2.1_fish.png)
+![](../output/figures/Partial.type_mod2.1_fish.png)
+
+#### EM effects
+
+```{r FishAbundance brms Model 2.1 Partial plots derived contrasts, results='markdown', eval=TRUE}
+```
+```{r FishAbundance brms Model 2.1 Partial plots derived contrasts figure, results='markdown', eval=FALSE}
+```
+![](../output/figures/Partial_contrast.Site_type1_mod2.1_fish.png)
+
+::::
+
+:::
+
+
+## Modelling (Zero-inflated Poisson) 
+
+::: {.panel-tabset}
+### Site type & Zone 
+:::: {.panel-tabset}
+
+#### Priors 
+```{r FishAbundance brms Model 3.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r FishAbundance brms Model 3.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r FishAbundance brms Model 3.1 posterior_prior, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Posterior_prior_mod3.1_fish.png)
+
+#### MCMC Diagnostics
+```{r FishAbundance brms Model 3.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod3.1_fish.png)
+![](../output/figures/Ac_mod3.1_fish.png)
+![](../output/figures/Rhat_mod3.1_fish.png)
+
+
+#### PPC
+
+```{r FishAbundance brms Model 3.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod3.1_fish.png)
+![](../output/figures/Ppc2_mod3.1_fish.png)
+![](../output/figures/Ppc3_mod3.1_fish.png)
+![](../output/figures/Ppc4_mod3.1_fish.png)
+
+#### DHARMa
+```{r FishAbundance brms Model 3.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod3.1_fish.png)
+
+::::
+
+:::
+
+
+
+## Modelling (Zero-inflated Poisson) 
+
+::: {.panel-tabset}
+### Site type & Zone 
+:::: {.panel-tabset}
+
+#### Priors 
+```{r FishAbundance brms Model 4.1 priors, results='markdown', eval=TRUE}
+```
+
+#### Fit model 
+```{r FishAbundance brms Model 4.1 fit, results='markdown', eval=FALSE}
+```
+
+#### Assess priors
+
+```{r FishAbundance brms Model 4.1 posterior_prior, results='markdown', eval=FALSE}
+```
+
+![](../output/figures/Posterior_prior_mod4.1_fish.png)
+
+#### MCMC Diagnostics
+```{r FishAbundance brms Model 4.1 mcmc diagnostics, results='markdown', eval=FALSE}
+```
+![](../output/figures/Trace_mod4.1_fish.png)
+![](../output/figures/Ac_mod4.1_fish.png)
+![](../output/figures/Rhat_mod4.1_fish.png)
+
+
+#### PPC
+
+```{r FishAbundance brms Model 4.1 ppc, results='markdown', eval=FALSE}
+```
+![](../output/figures/Ppc1_mod4.1_fish.png)
+![](../output/figures/Ppc2_mod4.1_fish.png)
+![](../output/figures/Ppc3_mod4.1_fish.png)
+![](../output/figures/Ppc4_mod4.1_fish.png)
+
+#### DHARMa
+```{r FishAbundance brms Model 4.1 DHARMa, results='markdown', eval=FALSE}
+```
+![](../output/figures/DHARMa1_mod4.1_fish.png)
+
+#### EM means
+
+```{r FishAbundance brms Model 4.1 Partial plots derived means, results='markdown', eval=FALSE}
+```
+```{r FishAbundance brms Model 4.1 Partial plots derived means figure, results='markdown', eval=FALSE}
+```
+![](../output/figures/Partial.type1_mod4.1_fish.png)
+![](../output/figures/Partial.type_mod4.1_fish.png)
+
+#### EM effects
+
+```{r FishAbundance brms Model 4.1 Partial plots derived contrasts, results='markdown', eval=TRUE}
+```
+```{r FishAbundance brms Model 4.1 Partial plots derived contrasts figure, results='markdown', eval=FALSE}
+```
+![](../output/figures/Partial_contrast.Site_type1_mod4.1_fish.png)
+
+::::
+
+:::
